@@ -20,17 +20,19 @@ def load_data():
     tracts_zip = os.path.join(base_dir, "East_Coast_Model_Ready.zip")
     hwy_zip = os.path.join(base_dir, "East_Coast_Highways_Visual.zip")
 
-    # 3. Read Tracts (using the absolute path)
-    gdf = gpd.read_file(f"zip://{tracts_zip}")
+    # 3. Read Tracts (Targeting the exact file inside the zip)
+    tracts_file = f"zip://{tracts_zip}!East_Coast_Model_Ready.geojson"
+    gdf = gpd.read_file(tracts_file)
+
     if gdf.crs.to_string() != "EPSG:4326":
         gdf = gdf.to_crs(epsg=4326)
     gdf['geometry'] = gdf['geometry'].simplify(tolerance=0.01, preserve_topology=True)
 
-    # 4. Read Highways (using absolute path + ! targeting)
+    # 4. Read Highways (Targeting the exact file inside the zip)
     hwy_gdf = None
     hwy_file = f"zip://{hwy_zip}!East_Coast_Highways_Visual.gpkg"
 
-    # FIX: Check if the physical zip file exists, not the zip:// string
+    # FIX: Check if the physical zip file exists on the server, not the zip:// string
     if os.path.exists(hwy_zip):
         try:
             hwy_gdf = gpd.read_file(hwy_file, layer='edges')
