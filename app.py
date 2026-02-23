@@ -12,20 +12,25 @@ st.markdown("Analyzing Base Layers and Mutually Exclusive Deployment Portfolios.
 
 @st.cache_data
 def load_data():
-    gdf = gpd.read_file("East_Coast_Model_Ready.geojson")
+    # 1. Read Tracts directly from the zip file
+    gdf = gpd.read_file("zip://East_Coast_Model_Ready.zip")
     if gdf.crs.to_string() != "EPSG:4326":
         gdf = gdf.to_crs(epsg=4326)
     gdf['geometry'] = gdf['geometry'].simplify(tolerance=0.01, preserve_topology=True)
 
+    # 2. Read Highways directly from the zip file (using ! to target the specific .gpkg inside)
     hwy_gdf = None
-    hwy_file = "East_Coast_Highways_Visual.gpkg"
+    hwy_file = "zip://East_Coast_Highways_Visual.zip!East_Coast_Highways_Visual.gpkg"
     if os.path.exists(hwy_file):
-        hwy_gdf = gpd.read_file(hwy_file, layer='edges')
-        if hwy_gdf.crs.to_string() != "EPSG:4326":
-            hwy_gdf = hwy_gdf.to_crs(epsg=4326)
-        hwy_gdf['geometry'] = hwy_gdf['geometry'].simplify(tolerance=0.005)
-        if 'ref' not in hwy_gdf.columns:
-            hwy_gdf['ref'] = "Hwy"
+        try:
+            hwy_gdf = gpd.read_file(hwy_file, layer='edges')
+            if hwy_gdf.crs.to_string() != "EPSG:4326":
+                hwy_gdf = hwy_gdf.to_crs(epsg=4326)
+            hwy_gdf['geometry'] = hwy_gdf['geometry'].simplify(tolerance=0.005)
+            if 'ref' not in hwy_gdf.columns:
+                hwy_gdf['ref'] = "Hwy"
+        except Exception as e:
+            print(f"Skipping highways for now: {e}")
 
     return gdf, hwy_gdf
 
