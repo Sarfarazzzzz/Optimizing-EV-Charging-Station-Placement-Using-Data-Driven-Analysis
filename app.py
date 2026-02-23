@@ -10,18 +10,28 @@ st.set_page_config(layout="wide", page_title="EV Suitability Analysis")
 st.title("⚡ Phase 5: Multi-Criteria Suitability Analysis")
 st.markdown("Analyzing Base Layers and Mutually Exclusive Deployment Portfolios.")
 
+
 @st.cache_data
 def load_data():
-    # 1. Read Tracts directly from the zip file
-    gdf = gpd.read_file("zip://East_Coast_Model_Ready.zip")
+    # 1. Get the exact absolute path of the Streamlit Cloud server directory
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # 2. Construct the absolute paths to the physical zip files
+    tracts_zip = os.path.join(base_dir, "East_Coast_Model_Ready.zip")
+    hwy_zip = os.path.join(base_dir, "East_Coast_Highways_Visual.zip")
+
+    # 3. Read Tracts (using the absolute path)
+    gdf = gpd.read_file(f"zip://{tracts_zip}")
     if gdf.crs.to_string() != "EPSG:4326":
         gdf = gdf.to_crs(epsg=4326)
     gdf['geometry'] = gdf['geometry'].simplify(tolerance=0.01, preserve_topology=True)
 
-    # 2. Read Highways directly from the zip file (using ! to target the specific .gpkg inside)
+    # 4. Read Highways (using absolute path + ! targeting)
     hwy_gdf = None
-    hwy_file = "zip://East_Coast_Highways_Visual.zip!East_Coast_Highways_Visual.gpkg"
-    if os.path.exists(hwy_file):
+    hwy_file = f"zip://{hwy_zip}!East_Coast_Highways_Visual.gpkg"
+
+    # FIX: Check if the physical zip file exists, not the zip:// string
+    if os.path.exists(hwy_zip):
         try:
             hwy_gdf = gpd.read_file(hwy_file, layer='edges')
             if hwy_gdf.crs.to_string() != "EPSG:4326":
