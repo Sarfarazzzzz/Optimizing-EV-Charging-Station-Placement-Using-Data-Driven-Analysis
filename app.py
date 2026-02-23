@@ -1,3 +1,5 @@
+import zipfile
+import tempfile
 import streamlit as st
 import geopandas as gpd
 import folium
@@ -13,27 +15,40 @@ st.markdown("Analyzing Base Layers and Mutually Exclusive Deployment Portfolios.
 
 @st.cache_data
 def load_data():
-    # 1. Get the exact absolute path of the Streamlit Cloud server directory
     base_dir = os.path.dirname(os.path.abspath(__file__))
+    temp_dir = tempfile.gettempdir()  # Streamlit's safe temporary folder
 
-    # 2. Construct the absolute paths to the physical zip files
     tracts_zip = os.path.join(base_dir, "East_Coast_Model_Ready.zip")
     hwy_zip = os.path.join(base_dir, "East_Coast_Highways_Visual.zip")
 
-    # 3. Read Tracts (Targeting the exact file inside the zip)
-    tracts_file = f"zip://{tracts_zip}!East_Coast_Model_Ready.geojson"
-    gdf = gpd.read_file(tracts_file)
+    # HELPER: Unzips the file safely, ignores __MACOSX, and returns the physical file path
+    def extract_target_file(zip_path, extension):
+        if not os.path.exists(zip_path):
+            return None
+        with zipfile.ZipFile(zip_path, 'r') as z:
+            for file_name in z.namelist():
+                # Find our file and ignore Apple's hidden folders
+                if file_name.endswith(extension) and '__MACOSX' not in file_name:
+                    z.extract(file_name, temp_dir)
+                    return os.path.join(temp_dir, file_name)
+        return None
 
+    # 1. Extract and Read Tracts
+    tracts_file = extract_target_file(tracts_zip, '.geojson')
+    if not tracts_file:
+        st.error("Error: Could not extract the tracts .geojson file from the zip archive.")
+        st.stop()
+
+    gdf = gpd.read_file(tracts_file)
     if gdf.crs.to_string() != "EPSG:4326":
         gdf = gdf.to_crs(epsg=4326)
     gdf['geometry'] = gdf['geometry'].simplify(tolerance=0.01, preserve_topology=True)
 
-    # 4. Read Highways (Targeting the exact file inside the zip)
+    # 2. Extract and Read Highways
     hwy_gdf = None
-    hwy_file = f"zip://{hwy_zip}!East_Coast_Highways_Visual.gpkg"
+    hwy_file = extract_target_file(hwy_zip, '.gpkg')
 
-    # FIX: Check if the physical zip file exists on the server, not the zip:// string
-    if os.path.exists(hwy_zip):
+    if hwy_file:
         try:
             hwy_gdf = gpd.read_file(hwy_file, layer='edges')
             if hwy_gdf.crs.to_string() != "EPSG:4326":
