@@ -16,18 +16,22 @@ st.markdown("Analyzing Base Layers and Mutually Exclusive Deployment Portfolios.
 @st.cache_data
 def load_data():
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    temp_dir = tempfile.gettempdir()  # Streamlit's safe temporary folder
+    temp_dir = tempfile.gettempdir()
 
-    tracts_zip = os.path.join(base_dir, "East_Coast_Model_Ready.zip")
-    hwy_zip = os.path.join(base_dir, "East_Coast_Highways_Visual.zip")
+    # Check for both standard and Mac-specific zip naming
+    tracts_zip_1 = os.path.join(base_dir, "East_Coast_Model_Ready.zip")
+    tracts_zip_2 = os.path.join(base_dir, "East_Coast_Model_Ready.geojson.zip")
+    tracts_zip = tracts_zip_1 if os.path.exists(tracts_zip_1) else tracts_zip_2
 
-    # HELPER: Unzips the file safely, ignores __MACOSX, and returns the physical file path
+    hwy_zip_1 = os.path.join(base_dir, "East_Coast_Highways_Visual.zip")
+    hwy_zip_2 = os.path.join(base_dir, "East_Coast_Highways_Visual.gpkg.zip")
+    hwy_zip = hwy_zip_1 if os.path.exists(hwy_zip_1) else hwy_zip_2
+
     def extract_target_file(zip_path, extension):
-        if not os.path.exists(zip_path):
+        if not zip_path or not os.path.exists(zip_path):
             return None
         with zipfile.ZipFile(zip_path, 'r') as z:
             for file_name in z.namelist():
-                # Find our file and ignore Apple's hidden folders
                 if file_name.endswith(extension) and '__MACOSX' not in file_name:
                     z.extract(file_name, temp_dir)
                     return os.path.join(temp_dir, file_name)
@@ -36,7 +40,7 @@ def load_data():
     # 1. Extract and Read Tracts
     tracts_file = extract_target_file(tracts_zip, '.geojson')
     if not tracts_file:
-        st.error("Error: Could not extract the tracts .geojson file from the zip archive.")
+        st.error(f"Error: Could not find or extract the tracts zip file. Looked for {tracts_zip}")
         st.stop()
 
     gdf = gpd.read_file(tracts_file)
