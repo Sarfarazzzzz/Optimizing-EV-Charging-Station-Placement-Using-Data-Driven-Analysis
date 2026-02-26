@@ -9,8 +9,8 @@ import os
 
 st.set_page_config(layout="wide", page_title="EV Suitability Analysis")
 
-st.title("⚡ Phase 5: Multi-Criteria Suitability Analysis")
-st.markdown("Analyzing Base Layers and Mutually Exclusive Deployment Portfolios.")
+st.title("East Coast EV Infrastructure Explorer")
+st.markdown("Interactive tool for filtering 37,000 neighborhoods to find the best spots for new chargers.")
 
 
 @st.cache_data
@@ -108,16 +108,16 @@ dual_targets = unserved[mask_corridor & mask_demand & mask_equity]
 # --- METRICS UI ---
 st.markdown("#### Database Overview")
 c1, c2, c3, c4 = st.columns(4)
-c1.metric("Total Tracts Examined", f"{len(gdf):,}")
+c1.metric("Total Census Tracts", f"{len(gdf):,}")
 c2.metric("Total Unserved (0 Chargers)", f"{len(unserved):,}")
-c3.metric("Raw Equity Tracts", f"{len(base_equity):,}")
-c4.metric("Raw Demand Tracts", f"{len(base_demand):,}")
+c3.metric("Equity Priority Areas", f"{len(base_equity):,}")
+c4.metric("High-Demand Areas", f"{len(base_demand):,}")
 
-st.markdown("#### Strategic Portfolios (Corridor + Criteria)")
+st.markdown("#### Filtered Deployment Opportunities")
 c5, c6, c7 = st.columns(3)
-c5.metric("📈 Market Only", f"{len(market_only):,}")
-c6.metric("⚖️ Equity Only", f"{len(equity_only):,}")
-c7.metric("⭐ Dual-Benefit", f"{len(dual_targets):,}")
+c5.metric("📈 Market-Driven Targets", f"{len(market_only):,}")
+c6.metric("⚖️ Equity-Driven Targets", f"{len(equity_only):,}")
+c7.metric("⭐ Optimal Targets (Demand + Equity)", f"{len(dual_targets):,}")
 
 # --- BUILD MAP ---
 center_lat, center_lon = gdf.geometry.centroid.y.mean(), gdf.geometry.centroid.x.mean()
