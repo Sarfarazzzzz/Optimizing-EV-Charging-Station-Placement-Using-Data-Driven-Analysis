@@ -64,7 +64,7 @@ def load_data():
             print(f"Skipping highways for now: {e}")
 
     # 3. Load Phase 6 Optimization Data (If generated)
-    mclp_file = os.path.join(base_dir, "Optimized_MCLP_Capacity.geojson")
+    mclp_file = os.path.join(base_dir, "Optimized_Phase6_Network.geojson")
     sclp_file = os.path.join(base_dir, "Optimized_SCLP_Blanket.geojson")
     
     mclp_gdf = gpd.read_file(mclp_file) if os.path.exists(mclp_file) else None
