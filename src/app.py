@@ -9,8 +9,8 @@ import os
 
 st.set_page_config(layout="wide", page_title="EV Suitability Analysis")
 
-st.title("⚡ Phase 5: Multi-Criteria Suitability Analysis")
-st.markdown("Analyzing Base Layers and Mutually Exclusive Deployment Portfolios.")
+st.title("⚡ Phase 5 & 6: Prescriptive EV Infrastructure Analytics")
+st.markdown("Analyzing Base Suitability and Evaluating Mathematical Optimization Portfolios.")
 
 
 @st.cache_data
@@ -63,26 +63,39 @@ def load_data():
         except Exception as e:
             print(f"Skipping highways for now: {e}")
 
-    return gdf, hwy_gdf
+    # 3. Load Phase 6 Optimization Data (If generated)
+    mclp_file = os.path.join(base_dir, "Optimized_Phase6_Network.geojson")
+    sclp_file = os.path.join(base_dir, "Optimized_SCLP_Blanket.geojson")
+    
+    mclp_gdf = gpd.read_file(mclp_file) if os.path.exists(mclp_file) else None
+    sclp_gdf = gpd.read_file(sclp_file) if os.path.exists(sclp_file) else None
 
-with st.spinner("Loading spatial data and highway networks..."):
-    gdf, hwy_gdf = load_data()
+    return gdf, hwy_gdf, mclp_gdf, sclp_gdf
+
+with st.spinner("Loading spatial models and executing network architecture..."):
+    gdf, hwy_gdf, mclp_gdf, sclp_gdf = load_data()
 
 # --- SIDEBAR: CONTROLS & TOGGLES ---
-st.sidebar.header("🎯 Target Thresholds")
+st.sidebar.header("🎯 Phase 5: Target Thresholds")
 max_dist = st.sidebar.slider("Corridor (Max Miles to Hwy)", 0.5, 5.0, 1.0, step=0.5)
 max_inc = st.sidebar.slider("Equity (Max Median Income)", 20000, 100000, 50000, step=5000)
 min_commuters = st.sidebar.slider("Demand (Min Daily Commuters)", 0, 5000, 1000, step=250)
 
-st.sidebar.markdown("### 🛠️ Analysis Layers (Base Data)")
-show_corridor = st.sidebar.checkbox("Show All Corridor Gaps (Red)", value=False)
-show_equity = st.sidebar.checkbox("Show All Equity Tracts (Blue)", value=False)
-show_demand = st.sidebar.checkbox("Show All High Demand (Yellow)", value=False)
+st.sidebar.markdown("### 🧠 Phase 6: Optimization AI")
+opt_strategy = st.sidebar.radio(
+    "Select Prescriptive Strategy:",
+    ["Off", "MCLP: Maximize Demand (100 Budget)", "SCLP: 100% Blanket Coverage"]
+)
 
 st.sidebar.markdown("### 🚀 Deployment Portfolios")
 show_market = st.sidebar.checkbox("Show Market Only (Orange)", value=True)
 show_equity_port = st.sidebar.checkbox("Show Equity Only (Purple)", value=True)
 show_dual = st.sidebar.checkbox("Show Dual-Benefit (Teal)", value=True)
+
+st.sidebar.markdown("### 🛠️ Analysis Layers (Base Data)")
+show_corridor = st.sidebar.checkbox("Show All Corridor Gaps (Red)", value=False)
+show_equity = st.sidebar.checkbox("Show All Equity Tracts (Blue)", value=False)
+show_demand = st.sidebar.checkbox("Show All High Demand (Yellow)", value=False)
 
 st.sidebar.markdown("### 🛣️ Infrastructure Layers")
 show_highways = st.sidebar.checkbox("Show Highways & Labels", value=True)
@@ -100,7 +113,7 @@ base_corridor = unserved[mask_corridor]
 base_equity = unserved[mask_equity]
 base_demand = unserved[mask_demand]
 
-# 2. Mutually Exclusive Portfolios (Fixes the color blending)
+# 2. Mutually Exclusive Portfolios
 market_only = unserved[mask_corridor & mask_demand & ~mask_equity]
 equity_only = unserved[mask_corridor & mask_equity & ~mask_demand]
 dual_targets = unserved[mask_corridor & mask_demand & mask_equity]
@@ -113,7 +126,7 @@ c2.metric("Total Unserved (0 Chargers)", f"{len(unserved):,}")
 c3.metric("Raw Equity Tracts", f"{len(base_equity):,}")
 c4.metric("Raw Demand Tracts", f"{len(base_demand):,}")
 
-st.markdown("#### Strategic Portfolios (Corridor + Criteria)")
+st.markdown("#### Phase 5: Strategic Portfolios (Corridor + Criteria)")
 c5, c6, c7 = st.columns(3)
 c5.metric("📈 Market Only", f"{len(market_only):,}")
 c6.metric("⚖️ Equity Only", f"{len(equity_only):,}")
@@ -157,7 +170,33 @@ if show_dual and not dual_targets.empty:
         style_function=lambda x: {'fillColor': '#008080', 'stroke': False, 'fillOpacity': 0.8},
         tooltip=folium.GeoJsonTooltip(fields=['dist_to_hwy_miles', 'median_income', 'commuters_total'], aliases=['Hwy Dist:', 'Income:', 'Commuters:'])).add_to(m)
 
-# C. Infrastructure Layers
+# C. Phase 6 Optimization Layers
+if opt_strategy == "MCLP: Maximize Demand (100 Budget)" and mclp_gdf is not None:
+    for _, row in mclp_gdf.iterrows():
+        icon = folium.Icon(color='red', icon='bolt', prefix='fa')
+        folium.Marker(
+            location=[row.geometry.centroid.y, row.geometry.centroid.x],
+            icon=icon, 
+            popup=f"<b>MCLP Hub</b><br>Chargers Assigned: {row.get('chargers_assigned', '1')}<br>Demand: {row.get('commuters_total', 'N/A')}"
+        ).add_to(m)
+
+elif opt_strategy == "SCLP: 100% Blanket Coverage" and sclp_gdf is not None:
+    # Upgrade to a dynamic cluster to handle all 1,714 hubs smoothly
+    sclp_cluster = plugins.MarkerCluster(name="SCLP Blanket Hubs")
+    
+    for _, row in sclp_gdf.iterrows():
+        # Match the visual language of the other chargers, but use 'darkblue' to stand out
+        icon = folium.Icon(color='darkblue', icon='bolt', prefix='fa')
+        
+        folium.Marker(
+            location=[row.geometry.centroid.y, row.geometry.centroid.x],
+            icon=icon,
+            popup="<b>SCLP Minimum Viable Hub</b>"
+        ).add_to(sclp_cluster)
+        
+    sclp_cluster.add_to(m)
+
+# D. Infrastructure Layers
 if show_highways and hwy_gdf is not None:
     folium.GeoJson(hwy_gdf[['ref', 'geometry']], name="Interstates",
         style_function=lambda x: {'color': 'black', 'weight': 2, 'opacity': 0.6},
