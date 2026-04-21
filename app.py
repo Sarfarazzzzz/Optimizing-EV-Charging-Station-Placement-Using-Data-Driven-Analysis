@@ -181,15 +181,20 @@ if opt_strategy == "MCLP: Maximize Demand (100 Budget)" and mclp_gdf is not None
         ).add_to(m)
 
 elif opt_strategy == "SCLP: 100% Blanket Coverage" and sclp_gdf is not None:
+    # Upgrade to a dynamic cluster to handle all 1,714 hubs smoothly
+    sclp_cluster = plugins.MarkerCluster(name="SCLP Blanket Hubs")
+    
     for _, row in sclp_gdf.iterrows():
-        folium.CircleMarker(
+        # Match the visual language of the other chargers, but use 'darkblue' to stand out
+        icon = folium.Icon(color='darkblue', icon='bolt', prefix='fa')
+        
+        folium.Marker(
             location=[row.geometry.centroid.y, row.geometry.centroid.x],
-            radius=4,
-            color='blue',
-            fill=True,
-            fillOpacity=0.7,
-            popup="<b>SCLP Blanket Hub</b>"
-        ).add_to(m)
+            icon=icon,
+            popup="<b>SCLP Minimum Viable Hub</b>"
+        ).add_to(sclp_cluster)
+        
+    sclp_cluster.add_to(m)
 
 # D. Infrastructure Layers
 if show_highways and hwy_gdf is not None:
