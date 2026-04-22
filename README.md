@@ -75,4 +75,35 @@ Translated policy constraints into systems of linear equations using Linear Prog
 │   └── Optimized_SCLP_Blanket.geojson    # Final SCLP (1,714 Hubs) output
 ├── README.md
 └── requirements.txt                      # Project dependencies
+```
 
+## 🚀 How to Run Locally
+
+To run the prescriptive dashboard on your machine, follow these steps:
+
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/yourusername/Optimizing-EV-Charging-Station-Placement.git](https://github.com/yourusername/Optimizing-EV-Charging-Station-Placement.git)
+   cd Optimizing-EV-Charging-Station-Placement ```
+
+
+2. **Install the required dependencies:**
+  *This project requires Python 3.9 or higher. Install the necessary libraries by running:*
+   ```bash
+   pip install -r requirements.txt
+   ```
+*(Alternatively: pip install geopandas pandas pulp streamlit folium streamlit-folium pyarrow openpyxl)*
+
+3. **Boot up the interactive dashboard:**
+  *Launch the Streamlit server from the root directory:*
+   ```bash
+   streamlit run src/app.py
+   ```
+
+## 🌐 Live Application
+The complete, interactive spatial dashboard is deployed and hosted via Streamlit Community Cloud. You can dynamically toggle between the Phase 5 base suitability analysis and the mathematically validated Phase 6 Optimization models (MCLP & SCLP) directly in your browser without installing any dependencies.
+
+👉 [Access the Live Dashboard Here](https://optimizing-ev-charging-station-placement-using-data-driven.streamlit.app/)
+
+Developed by Mohammed Ismail Sarfaraz Shaik | M.S. Data Science, The George Washington University
+   
