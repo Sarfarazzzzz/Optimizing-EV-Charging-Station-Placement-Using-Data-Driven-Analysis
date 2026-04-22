@@ -15,16 +15,22 @@ st.markdown("Analyzing Base Suitability and Evaluating Mathematical Optimization
 
 @st.cache_data
 def load_data():
-    base_dir = os.path.dirname(os.path.abspath(__file__))
+    # --- 1. NAVIGATE THE NEW FOLDER STRUCTURE ---
+    src_dir = os.path.dirname(os.path.abspath(__file__))  # We are in 'src/'
+    repo_dir = os.path.dirname(src_dir)                   # Step up to the main repo folder
+    
+    data_dir = os.path.join(repo_dir, "data")             # Point to 'data/'
+    outputs_dir = os.path.join(repo_dir, "outputs")       # Point to 'outputs/'
+    
     temp_dir = tempfile.gettempdir()
 
-    # Check for both standard and Mac-specific zip naming
-    tracts_zip_1 = os.path.join(base_dir, "East_Coast_Model_Ready.zip")
-    tracts_zip_2 = os.path.join(base_dir, "East_Coast_Model_Ready.geojson.zip")
+    # --- 2. CHECK FOR ZIPS IN THE 'DATA' FOLDER ---
+    tracts_zip_1 = os.path.join(data_dir, "East_Coast_Model_Ready.zip")
+    tracts_zip_2 = os.path.join(data_dir, "East_Coast_Model_Ready.geojson.zip")
     tracts_zip = tracts_zip_1 if os.path.exists(tracts_zip_1) else tracts_zip_2
 
-    hwy_zip_1 = os.path.join(base_dir, "East_Coast_Highways_Visual.zip")
-    hwy_zip_2 = os.path.join(base_dir, "East_Coast_Highways_Visual.gpkg.zip")
+    hwy_zip_1 = os.path.join(data_dir, "East_Coast_Highways_Visual.zip")
+    hwy_zip_2 = os.path.join(data_dir, "East_Coast_Highways_Visual.gpkg.zip")
     hwy_zip = hwy_zip_1 if os.path.exists(hwy_zip_1) else hwy_zip_2
 
     def extract_target_file(zip_path, extension):
@@ -37,7 +43,7 @@ def load_data():
                     return os.path.join(temp_dir, file_name)
         return None
 
-    # 1. Extract and Read Tracts
+    # --- 3. EXTRACT AND READ TRACTS ---
     tracts_file = extract_target_file(tracts_zip, '.geojson')
     if not tracts_file:
         st.error(f"Error: Could not find or extract the tracts zip file. Looked for {tracts_zip}")
@@ -48,7 +54,7 @@ def load_data():
         gdf = gdf.to_crs(epsg=4326)
     gdf['geometry'] = gdf['geometry'].simplify(tolerance=0.01, preserve_topology=True)
 
-    # 2. Extract and Read Highways
+    # --- 4. EXTRACT AND READ HIGHWAYS ---
     hwy_gdf = None
     hwy_file = extract_target_file(hwy_zip, '.gpkg')
 
@@ -63,9 +69,9 @@ def load_data():
         except Exception as e:
             print(f"Skipping highways for now: {e}")
 
-    # 3. Load Phase 6 Optimization Data (If generated)
-    mclp_file = os.path.join(base_dir, "Optimized_Phase6_Network.geojson")
-    sclp_file = os.path.join(base_dir, "Optimized_SCLP_Blanket.geojson")
+    # --- 5. LOAD PHASE 6 OUTPUTS FROM 'OUTPUTS' FOLDER ---
+    mclp_file = os.path.join(outputs_dir, "Optimized_Phase6_Network.geojson")
+    sclp_file = os.path.join(outputs_dir, "Optimized_SCLP_Blanket.geojson")
     
     mclp_gdf = gpd.read_file(mclp_file) if os.path.exists(mclp_file) else None
     sclp_gdf = gpd.read_file(sclp_file) if os.path.exists(sclp_file) else None
