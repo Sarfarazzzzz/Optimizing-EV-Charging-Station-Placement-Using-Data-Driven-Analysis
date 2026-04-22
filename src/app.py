@@ -205,22 +205,6 @@ if show_sclp and sclp_gdf is not None:
         ).add_to(sclp_cluster)
     sclp_cluster.add_to(m)
 
-'''elif opt_strategy == "SCLP: 100% Blanket Coverage" and sclp_gdf is not None:
-    # Upgrade to a dynamic cluster to handle all 1,714 hubs smoothly
-    sclp_cluster = plugins.MarkerCluster(name="SCLP Blanket Hubs")
-    
-    for _, row in sclp_gdf.iterrows():
-        # Match the visual language of the other chargers, but use 'darkblue' to stand out
-        icon = folium.Icon(color='darkblue', icon='bolt', prefix='fa')
-        
-        folium.Marker(
-            location=[row.geometry.centroid.y, row.geometry.centroid.x],
-            icon=icon,
-            popup="<b>SCLP Minimum Viable Hub</b>"
-        ).add_to(sclp_cluster)
-        
-    sclp_cluster.add_to(m)'''
-
 # D. Infrastructure Layers
 if show_highways and hwy_gdf is not None:
     folium.GeoJson(hwy_gdf[['ref', 'geometry']], name="Interstates",
