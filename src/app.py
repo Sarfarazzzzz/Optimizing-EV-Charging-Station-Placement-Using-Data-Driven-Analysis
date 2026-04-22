@@ -87,11 +87,15 @@ max_dist = st.sidebar.slider("Corridor (Max Miles to Hwy)", 0.5, 5.0, 1.0, step=
 max_inc = st.sidebar.slider("Equity (Max Median Income)", 20000, 100000, 50000, step=5000)
 min_commuters = st.sidebar.slider("Demand (Min Daily Commuters)", 0, 5000, 1000, step=250)
 
+# THIS IS THE NEW CODE YOU NEED:
 st.sidebar.markdown("### 🧠 Phase 6: Optimization AI")
-opt_strategy = st.sidebar.radio(
-    "Select Prescriptive Strategy:",
-    ["Off", "MCLP: Maximize Demand (100 Budget)", "SCLP: 100% Blanket Coverage"]
-)
+show_mclp = st.sidebar.checkbox("Show MCLP (100 Budget Hubs)", value=False)
+show_sclp = st.sidebar.checkbox("Show SCLP (1,714 Blanket Hubs)", value=False)
+
+if show_mclp and mclp_gdf is None:
+    st.sidebar.error("MCLP Data missing! Check the outputs folder.")
+if show_sclp and sclp_gdf is None:
+    st.sidebar.error("SCLP Data missing! Check the outputs folder.")
 
 st.sidebar.markdown("### 🚀 Deployment Portfolios")
 show_market = st.sidebar.checkbox("Show Market Only (Orange)", value=True)
