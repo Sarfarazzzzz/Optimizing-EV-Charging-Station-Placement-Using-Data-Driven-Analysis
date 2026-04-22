@@ -177,7 +177,10 @@ if show_dual and not dual_targets.empty:
         tooltip=folium.GeoJsonTooltip(fields=['dist_to_hwy_miles', 'median_income', 'commuters_total'], aliases=['Hwy Dist:', 'Income:', 'Commuters:'])).add_to(m)
 
 # C. Phase 6 Optimization Layers
-if opt_strategy == "MCLP: Maximize Demand (100 Budget)" and mclp_gdf is not None:
+# C. Phase 6 Optimization Layers
+
+# Layer 1: Draw MCLP (Red Lightning Bolts)
+if show_mclp and mclp_gdf is not None:
     for _, row in mclp_gdf.iterrows():
         icon = folium.Icon(color='red', icon='bolt', prefix='fa')
         folium.Marker(
@@ -185,6 +188,18 @@ if opt_strategy == "MCLP: Maximize Demand (100 Budget)" and mclp_gdf is not None
             icon=icon, 
             popup=f"<b>MCLP Hub</b><br>Chargers Assigned: {row.get('chargers_assigned', '1')}<br>Demand: {row.get('commuters_total', 'N/A')}"
         ).add_to(m)
+
+# Layer 2: Draw SCLP (Blue Dynamic Cluster)
+if show_sclp and sclp_gdf is not None:
+    sclp_cluster = plugins.MarkerCluster(name="SCLP Blanket Hubs")
+    for _, row in sclp_gdf.iterrows():
+        icon = folium.Icon(color='darkblue', icon='bolt', prefix='fa')
+        folium.Marker(
+            location=[row.geometry.centroid.y, row.geometry.centroid.x],
+            icon=icon,
+            popup="<b>SCLP Minimum Viable Hub</b>"
+        ).add_to(sclp_cluster)
+    sclp_cluster.add_to(m)
 
 elif opt_strategy == "SCLP: 100% Blanket Coverage" and sclp_gdf is not None:
     # Upgrade to a dynamic cluster to handle all 1,714 hubs smoothly
