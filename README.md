@@ -85,7 +85,6 @@ To run the prescriptive dashboard on your machine, follow these steps:
    ```bash
    git clone [https://github.com/Sarfarazzzzz/Optimizing-EV-Charging-Station-Placement-Using-Data-Driven-Analysis](https://github.com/Sarfarazzzzz/Optimizing-EV-Charging-Station-Placement-Using-Data-Driven-Analysis.git)
    cd Optimizing-EV-Charging-Station-Placement
-   ```
    
 2. **Install the required dependencies:**
   *This project requires Python 3.9 or higher. Install the necessary libraries by running:*
