@@ -205,7 +205,7 @@ if show_sclp and sclp_gdf is not None:
         ).add_to(sclp_cluster)
     sclp_cluster.add_to(m)
 
-elif opt_strategy == "SCLP: 100% Blanket Coverage" and sclp_gdf is not None:
+'''elif opt_strategy == "SCLP: 100% Blanket Coverage" and sclp_gdf is not None:
     # Upgrade to a dynamic cluster to handle all 1,714 hubs smoothly
     sclp_cluster = plugins.MarkerCluster(name="SCLP Blanket Hubs")
     
@@ -219,7 +219,7 @@ elif opt_strategy == "SCLP: 100% Blanket Coverage" and sclp_gdf is not None:
             popup="<b>SCLP Minimum Viable Hub</b>"
         ).add_to(sclp_cluster)
         
-    sclp_cluster.add_to(m)
+    sclp_cluster.add_to(m)'''
 
 # D. Infrastructure Layers
 if show_highways and hwy_gdf is not None:
