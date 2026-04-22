@@ -83,7 +83,7 @@ To run the prescriptive dashboard on your machine, follow these steps:
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/Sarfarazzzzz/Optimizing-EV-Charging-Station-Placement.git](https://github.com/yourusername/Optimizing-EV-Charging-Station-Placement.git)
+   git clone [https://github.com/Sarfarazzzzz/Optimizing-EV-Charging-Station-Placement-Using-Data-Driven-Analysis](https://github.com/Sarfarazzzzz/Optimizing-EV-Charging-Station-Placement-Using-Data-Driven-Analysis.git)
    cd Optimizing-EV-Charging-Station-Placement ```
 
 
