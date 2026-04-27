@@ -9,7 +9,7 @@ import os
 
 st.set_page_config(layout="wide", page_title="EV Suitability Analysis")
 
-st.title("⚡ Phase 5 & 6: Prescriptive EV Infrastructure Analytics")
+st.title("Prescriptive EV Infrastructure Analytics")
 st.markdown("Analyzing Base Suitability and Evaluating Mathematical Optimization Portfolios.")
 
 
@@ -82,13 +82,13 @@ with st.spinner("Loading spatial models and executing network architecture..."):
     gdf, hwy_gdf, mclp_gdf, sclp_gdf = load_data()
 
 # --- SIDEBAR: CONTROLS & TOGGLES ---
-st.sidebar.header("🎯 Phase 5: Target Thresholds")
+st.sidebar.header("🎯 Target Thresholds")
 max_dist = st.sidebar.slider("Corridor (Max Miles to Hwy)", 0.5, 5.0, 1.0, step=0.5)
 max_inc = st.sidebar.slider("Equity (Max Median Income)", 20000, 100000, 50000, step=5000)
 min_commuters = st.sidebar.slider("Demand (Min Daily Commuters)", 0, 5000, 1000, step=250)
 
 # THIS IS THE NEW CODE YOU NEED:
-st.sidebar.markdown("### 🧠 Phase 6: Optimization AI")
+st.sidebar.markdown("### 🧠 Optimization Algorithm")
 show_mclp = st.sidebar.checkbox("Show MCLP (100 Budget Hubs)", value=False)
 show_sclp = st.sidebar.checkbox("Show SCLP (1,714 Blanket Hubs)", value=False)
 
