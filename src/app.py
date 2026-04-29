@@ -16,11 +16,11 @@ st.markdown("Analyzing Base Suitability and Evaluating Mathematical Optimization
 @st.cache_data
 def load_data():
     # --- 1. NAVIGATE THE NEW FOLDER STRUCTURE ---
-    src_dir = os.path.dirname(os.path.abspath(__file__))  # We are in 'src/'
-    repo_dir = os.path.dirname(src_dir)                   # Step up to the main repo folder
+    src_dir = os.path.dirname(os.path.abspath(__file__))  
+    repo_dir = os.path.dirname(src_dir)                  
     
-    data_dir = os.path.join(repo_dir, "data")             # Point to 'data/'
-    outputs_dir = os.path.join(repo_dir, "outputs")       # Point to 'outputs/'
+    data_dir = os.path.join(repo_dir, "data")             
+    outputs_dir = os.path.join(repo_dir, "outputs")      
     
     temp_dir = tempfile.gettempdir()
 
@@ -70,7 +70,7 @@ def load_data():
             print(f"Skipping highways for now: {e}")
 
     # --- 5. LOAD PHASE 6 OUTPUTS FROM 'OUTPUTS' FOLDER ---
-    mclp_file = os.path.join(outputs_dir, "Optimized_Phase6_Network.geojson")
+    mclp_file = os.path.join(outputs_dir, "Optimized_MCLP_Network.geojson")
     sclp_file = os.path.join(outputs_dir, "Optimized_SCLP_Blanket.geojson")
     
     mclp_gdf = gpd.read_file(mclp_file) if os.path.exists(mclp_file) else None
@@ -136,7 +136,7 @@ c2.metric("Total Unserved (0 Chargers)", f"{len(unserved):,}")
 c3.metric("Raw Equity Tracts", f"{len(base_equity):,}")
 c4.metric("Raw Demand Tracts", f"{len(base_demand):,}")
 
-st.markdown("#### Phase 5: Strategic Portfolios (Corridor + Criteria)")
+st.markdown("#### Strategic Portfolios (Corridor + Criteria)")
 c5, c6, c7 = st.columns(3)
 c5.metric("📈 Market Only", f"{len(market_only):,}")
 c6.metric("⚖️ Equity Only", f"{len(equity_only):,}")
